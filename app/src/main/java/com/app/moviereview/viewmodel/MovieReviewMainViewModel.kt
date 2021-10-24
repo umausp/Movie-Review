@@ -3,7 +3,7 @@ package com.app.moviereview.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.data.model.MovieReviewModel
+import com.app.data.model.MovieReviewItemModel
 import com.app.data.repository.MovieReviewRepository
 import com.app.data.utils.Resource
 import com.app.data.utils.toResource
@@ -14,9 +14,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MovieReviewMainViewModel @Inject constructor(private val movieReviewRepository: MovieReviewRepository) : ViewModel() {
+class MovieReviewMainViewModel @Inject constructor(
+    private val movieReviewRepository: MovieReviewRepository
+) : ViewModel() {
 
-    val movieReviewResourceLiveData = MutableLiveData<Resource<MovieReviewModel>>()
+    val movieReviewResourceLiveData = MutableLiveData<Resource<List<MovieReviewItemModel>>>()
+    val showLoadingToUI = MutableLiveData<Boolean>()
 
     init {
         getMovieReviewData()

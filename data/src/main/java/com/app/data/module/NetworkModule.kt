@@ -2,6 +2,7 @@ package com.app.data.module
 
 import com.app.data.BuildConfig
 import com.app.data.network.ApiKeyInterceptor
+import com.app.data.network.HttpRequestInterceptor
 import com.app.data.network.MovieReviewApiService
 import dagger.Module
 import dagger.Provides
@@ -31,10 +32,12 @@ object NetworkModule {
 
     @Provides
     fun provideAuthInterceptorOkHttpClient(
-        authInterceptor: ApiKeyInterceptor
+        authInterceptor: ApiKeyInterceptor,
+        httpRequestInterceptor: HttpRequestInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
+            .addNetworkInterceptor(httpRequestInterceptor)
             .build()
     }
 }
