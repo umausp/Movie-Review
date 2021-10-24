@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Movie Review"
 include ':app'
+include ':data'

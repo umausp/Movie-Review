@@ -1,21 +1,24 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'kotlin-parcelize'
 }
 
 android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "com.app.moviereview"
         minSdk 22
         targetSdk 31
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+        buildConfigField("java.lang.String","API_KEY",'"6eAMOkuxjdnG1lU1GgoAE8vOS4k77E0j"')
+        buildConfigField("java.lang.String","BASE_URL",'"https://api.nytimes.com/svc/movies/v2/"')
     }
 
     buildTypes {
@@ -38,25 +41,36 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.6.0'
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation 'com.facebook.stetho:stetho:1.5.1'
-    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
-    implementation project(':data')
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
-
-    //Google Truth for Unit Test
-    androidTestImplementation('com.google.truth:truth:1.1.3')
-    testImplementation('com.google.truth:truth:1.1.3')
-    //Mockk
-    testImplementation "io.mockk:mockk:1.12.0"
-
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
     //Hilt
     implementation "com.google.dagger:hilt-android:2.38.1"
     kapt "com.google.dagger:hilt-compiler:2.38.1"
 
+
+    //Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    // Dependency for mockwebserver tests.
+    testImplementation "com.squareup.okhttp3:mockwebserver:3.11.0"
+
+    //Google Truth for Unit Test
+    androidTestImplementation('com.google.truth:truth:1.1.3')
+    testImplementation('com.google.truth:truth:1.1.3')
+
+    //Mockk
+    testImplementation "io.mockk:mockk:1.12.0"
+
+    //Room
+    def room_version = "2.3.0" // check latest version from docs
+
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
+
+    implementation 'com.jakewharton.timber:timber:5.0.1'
 }
