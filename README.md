@@ -44,7 +44,7 @@
   ![Exhaustive Design](http://www.plantuml.com/plantuml/png/VP11IyD048Nl-ok6tdkmzImjKKIm8XNFoxXvIPPEicLtaWhYVpSnALICNlRolltUp6oISjIs5YCeb3HGz6MbbFi8fpuqXfs6I8jCF1fT42Sgd1b2Rae1xKBdOVVetvDzGUmGwSCGjGcE4sXn3oKMeH59j7r--BQyPbVcyqBq13s5UB1xf6De4cp6hi9FLrR17SWNTClAjEtO2xy99j_g5pfoT-z77q7gwpEvxfilgXz3wPqjGhG3RtSXXz1SSu_qi6CPnI6UfvwyruEtSBHStinApHzB3lnmZxa_KxZwBroR3PgyhUKB)
    
    
-6. **BotelNeck**  
+6. **Bottle Necks**  
   * If our App reaches to meximum users then single server may not be enough
   * We may need multiple server and Load Balancer to handle them
   * We may need S3 bucket for Image saving
