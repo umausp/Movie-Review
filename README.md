@@ -8,11 +8,13 @@
 
 **Key Technical Decisions** :
   1. MVVM Architecture
-  2. Kotlin with Coroutine and Flow
+  2. Kotlin with Coroutine and Flow with Retry Logic
   3. Dagger Hilt for DI
   4. Fresco for Image Caching library
   5. ViewModel for lifecycle handling
   6. Room DB for Network Caching
+  7. Timber for Logging
+  8. Stetho debug bridge for Android applications
 
 **Technnical Requirements** :     
   1. Data Model
