@@ -1,5 +1,7 @@
 package com.app.moviereview.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +13,7 @@ import com.app.moviereview.utils.bindImageUrlWithImage
 import com.app.moviereview.viewmodel.MovieReviewMainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class MovieReviewDetailsFragment : Fragment() {
 
@@ -18,7 +21,7 @@ class MovieReviewDetailsFragment : Fragment() {
     private val viewModel: MovieReviewMainViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentMovieReviewDetailsLayoutBinding.inflate(inflater).apply {
+        binding = FragmentMovieReviewDetailsLayoutBinding.inflate(inflater, container, false).apply {
             model = viewModel
             lifecycleOwner = this@MovieReviewDetailsFragment
         }
@@ -28,6 +31,12 @@ class MovieReviewDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.imgPlaceholder?.bindImageUrlWithImage(viewModel.selectedReview.value?.movieReviewEntity?.image_url)
+        binding?.btnSeeFullReview?.setOnClickListener {
+            Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(viewModel.selectedReview.value?.movieReviewEntity?.external_link)
+                startActivity(this)
+            }
+        }
     }
 
 
