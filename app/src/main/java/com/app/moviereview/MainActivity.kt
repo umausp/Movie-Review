@@ -1,12 +1,16 @@
 package com.app.moviereview
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.app.moviereview.databinding.ActivityMainBinding
 import com.app.moviereview.viewmodel.MovieReviewMainViewModel
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -15,40 +19,24 @@ class MainActivity : AppCompatActivity() {
 
     var binding: ActivityMainBinding? = null
 
+    private lateinit var appBarConfiguration: AppBarConfiguration
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater).apply {
-            model = viewModel
-            lifecycleOwner = this@MainActivity
-        }
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-        with(viewModel) {
-            movieReviewResourceLiveData.observe(this@MainActivity) {
-                it.onLoading {
-                    showLoadingToUI.value = it.isLoading()
-                }
-
-                it.onSuccess {
-                    Toast.makeText(this@MainActivity, it.size.toString(), Toast.LENGTH_SHORT).show()
-                }
-
-                it.onNetworkError { retry ->
-                    showSnackbar(getString(R.string.no_internet), retry)
-                }
-
-                it.onError { _, retry ->
-                    showSnackbar(getString(R.string.something_went_wrong), retry)
-                }
-            }
-        }
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+        val navController: NavController = navHostFragment.navController
+        appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
     }
 
-    private fun showSnackbar(message: String, retry: () -> Unit) {
-        Snackbar.make(binding?.main ?: return, message, Snackbar.LENGTH_INDEFINITE)
-            .setAction(getString(R.string.retry)) {
-                retry.invoke()
-            }.show()
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        return navController.navigateUp(appBarConfiguration)
+                || super.onSupportNavigateUp()
     }
 
     override fun onDestroy() {

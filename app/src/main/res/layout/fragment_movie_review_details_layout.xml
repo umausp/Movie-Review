@@ -1,9 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scr_summery"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="16dp"
+            android:maxHeight="200dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_author">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/txt_summery"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@{model.selectedReview.movieReviewEntity.summary_short}"
+                tools:text="Heading" />
+        </androidx.core.widget.NestedScrollView>
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/img_placeholder"
+            android:layout_width="0dp"
+            android:layout_height="220dp"
+            app:actualImageScaleType="focusCrop"
+            app:fadeDuration="300"
+            app:failureImage="@drawable/ic_placeholder"
+            app:failureImageScaleType="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:placeholderImage="@drawable/ic_placeholder"
+            app:placeholderImageScaleType="fitCenter"
+            app:progressBarAutoRotateInterval="200"
+            app:progressBarImage="@drawable/ic_loading"
+            app:progressBarImageScaleType="centerInside"
+            app:retryImageScaleType="centerCrop"
+            app:roundBottomLeft="true"
+            app:roundBottomRight="true"
+            app:roundTopLeft="true"
+            app:roundTopRight="true"
+            app:roundWithOverlayColor="@color/gray"
+            app:roundedCornerRadius="2dp"
+            app:roundingBorderColor="@color/white" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_see_full_review"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/see_full_review"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/txt_heading"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@{model.selectedReview.movieReviewEntity.headline}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/img_placeholder"
+            tools:text="Heading" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/txt_author"
+            style="@style/TextAppearance.MaterialComponents.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@{model.selectedReview.movieReviewEntity.review_by}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_heading"
+            tools:text="Heading" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="model"
+            type="com.app.moviereview.viewmodel.MovieReviewMainViewModel" />
+    </data>
 </layout>

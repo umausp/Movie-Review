@@ -3,4 +3,9 @@
     <string name="no_internet">No internet connection available</string>
     <string name="something_went_wrong">Something went wrong!</string>
     <string name="retry">Retry</string>
+    <string name="sort_by_name">Sort</string>
+    <string name="movie_review_fragment_label">Reviews</string>
+    <string name="search_with_name">Search with Name</string>
+    <string name="filter_by_name">Filter with Name</string>
+    <string name="see_full_review">See full review</string>
 </resources>

@@ -19,6 +19,8 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="androidx.appcompat.widget.SearchView"
+                android:resource="@xml/searchable" />
         </activity>
     </application>
 

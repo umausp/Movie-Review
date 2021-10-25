@@ -1,5 +1,6 @@
 package com.app.moviereview.viewmodel
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,8 +19,9 @@ class MovieReviewMainViewModel @Inject constructor(
     private val movieReviewRepository: MovieReviewRepository
 ) : ViewModel() {
 
-    val movieReviewResourceLiveData = MutableLiveData<Resource<List<MovieReviewItemModel>>>()
+    val movieReviewResourceLiveData = MediatorLiveData<Resource<List<MovieReviewItemModel>>>()
     val showLoadingToUI = MutableLiveData<Boolean>()
+    val selectedReview = MutableLiveData<MovieReviewItemModel>()
 
     init {
         getMovieReviewData()
