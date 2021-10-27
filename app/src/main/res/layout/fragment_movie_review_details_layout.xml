@@ -21,7 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@{model.selectedReview.movieReviewEntity.summary_short}"
+                android:text="@{model.selectedReview.summary_short}"
                 tools:text="Heading" />
         </androidx.core.widget.NestedScrollView>
 
@@ -68,7 +68,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="@{model.selectedReview.movieReviewEntity.headline}"
+            android:text="@{model.selectedReview.headline}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/img_placeholder"
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="@{model.selectedReview.movieReviewEntity.review_by}"
+            android:text="@{model.selectedReview.review_by}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/txt_heading"
             tools:text="Heading" />

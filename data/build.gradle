@@ -84,4 +84,5 @@ dependencies {
     testImplementation "androidx.room:room-testing:$room_version"
 
     implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation 'androidx.paging:paging-runtime-ktx:3.0.1'
 }

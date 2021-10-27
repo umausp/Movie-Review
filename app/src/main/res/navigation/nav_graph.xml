@@ -8,6 +8,7 @@
     <fragment
         android:id="@+id/MovieReviewListFragment"
         android:name="com.app.moviereview.ui.MovieReviewListFragment"
+        android:label="@string/app_name"
         tools:layout="@layout/fragment_movie_list_layout">
 
         <action
@@ -16,6 +17,7 @@
     </fragment>
 
     <fragment
+        android:label="@string/app_name"
         android:id="@+id/MovieReviewDetailsFragment"
         android:name="com.app.moviereview.ui.MovieReviewDetailsFragment"
         tools:layout="@layout/fragment_movie_review_details_layout">

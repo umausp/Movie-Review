@@ -14,7 +14,7 @@
   5. ViewModel for lifecycle handling
   6. Room DB for Network Caching
   7. Timber for Logging
-  8. Stetho debug bridge for Android applications
+  9. Jetpack Paging 3.0
 
 **Technnical Requirements** :     
   1. Data Model

@@ -30,10 +30,10 @@ class MovieReviewDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.imgPlaceholder?.bindImageUrlWithImage(viewModel.selectedReview.value?.movieReviewEntity?.image_url)
+        binding?.imgPlaceholder?.bindImageUrlWithImage(viewModel.selectedReview.value?.image_url)
         binding?.btnSeeFullReview?.setOnClickListener {
             Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(viewModel.selectedReview.value?.movieReviewEntity?.external_link)
+                data = Uri.parse(viewModel.selectedReview.value?.external_link)
                 startActivity(this)
             }
         }

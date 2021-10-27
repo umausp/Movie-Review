@@ -1,21 +1,55 @@
 package com.app.data.storage
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.app.data.model.Result
 import com.google.gson.annotations.SerializedName
 
-@Database(entities = [MovieReviewEntity::class], version = 1)
+@Database(entities = [MovieReviewEntity::class, RemoteKeys::class], version = 1)
 abstract class MovieReviewDataBase : RoomDatabase() {
     abstract fun getMovieReviewDao(): MovieReviewDao
+    abstract fun remoteKeysDao(): RemoteKeysDao
 }
+
+@Dao
+interface RemoteKeysDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(remoteKey: List<RemoteKeys>)
+
+    @Query("SELECT * FROM remote_keys WHERE repoId = :repoId")
+    suspend fun remoteKeysRepoId(repoId: Int): RemoteKeys?
+
+    @Query("DELETE FROM remote_keys")
+    suspend fun clearRemoteKeys()
+}
+
+@Entity(tableName = "remote_keys")
+data class RemoteKeys(
+    @PrimaryKey
+    val repoId: Int,
+    val prevKey: Int?,
+    val nextKey: Int?,
+    var hasMore: Boolean?
+)
+
 
 @Dao
 interface MovieReviewDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllMovieReviews(movieReviewEntity: List<MovieReviewEntity>)
 
-    @Query("select * from movieReviewEntity where page =:page")
-    suspend fun getAllSavedList(page: Int): List<MovieReviewEntity>
+    @Query("select * from movieReviewEntity")
+    suspend fun getAllSavedList(): List<MovieReviewEntity>
+
+    @Query("SELECT * FROM movieReviewEntity")
+    fun moviesPagingSource(): PagingSource<Int, MovieReviewEntity>
+
+    @Query("SELECT * FROM movieReviewEntity WHERE uId = :entityId")
+    suspend fun movieEntityId(entityId: Int): MovieReviewEntity?
+
+    @Query("SELECT COUNT(title) FROM movieReviewEntity")
+    suspend fun getRowCount(): Int = 0
 
     @Query("DELETE FROM movieReviewEntity")
     suspend fun clearAllData()
@@ -23,7 +57,7 @@ interface MovieReviewDao {
 
 @Entity(tableName = "movieReviewEntity")
 data class MovieReviewEntity(
-    @PrimaryKey(autoGenerate = true) val uId: Int = 0,
+    @PrimaryKey val uId : Int = 0,
 
     @ColumnInfo(name = "title")
     @SerializedName("title")
@@ -59,10 +93,14 @@ data class MovieReviewEntity(
 
     @ColumnInfo(name = "time")
     @SerializedName("time")
-    var time: Long = 0
+    var time: Long = 0,
+
+    @ColumnInfo(name = "has_more")
+    @SerializedName("has_more")
+    var hasMore: Boolean = false
 )
 
-fun Result.toEntityData(pageOffset: Int, currentTime: Long) = MovieReviewEntity(
+fun Result.toEntityData(pageOffset: Int, currentTime: Long, hasMore: Boolean, uId: Int) = MovieReviewEntity(
     title = this.display_title.orEmpty(),
     review_by = this.byline.orEmpty(),
     headline = this.headline.orEmpty(),
@@ -71,5 +109,7 @@ fun Result.toEntityData(pageOffset: Int, currentTime: Long) = MovieReviewEntity(
     image_url = this.multimedia?.src.orEmpty(),
     opening_date = this.opening_date.orEmpty(),
     page = pageOffset,
-    time = currentTime
+    time = currentTime,
+    hasMore = hasMore,
+    uId = uId
 )

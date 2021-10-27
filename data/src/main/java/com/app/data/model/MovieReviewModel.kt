@@ -10,5 +10,6 @@ data class MovieReviewModel(
     val has_more: Boolean?,
     val num_results: Int?,
     val results: List<Result>?,
-    val status: String?
+    val status: String?,
+    var page : Int?
 ) : Parcelable

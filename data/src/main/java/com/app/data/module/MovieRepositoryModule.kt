@@ -1,8 +1,9 @@
 package com.app.data.module
 
+import androidx.paging.ExperimentalPagingApi
 import com.app.data.network.MovieReviewApiService
 import com.app.data.repository.MovieReviewRepository
-import com.app.data.storage.MovieReviewDao
+import com.app.data.storage.MovieReviewDataBase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,13 +15,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 @InstallIn(ViewModelComponent::class)
 object MovieRepositoryModule {
 
+    @ExperimentalPagingApi
     @Provides
     @ViewModelScoped
     fun provideMovieRepository(
         movieReviewApiService: MovieReviewApiService,
-        movieReviewDao: MovieReviewDao,
+        movieReviewDb: MovieReviewDataBase,
         coroutineDispatcher: CoroutineDispatcher
     ): MovieReviewRepository {
-        return MovieReviewRepository(movieReviewApiService, movieReviewDao, coroutineDispatcher)
+        return MovieReviewRepository(movieReviewApiService, movieReviewDb, coroutineDispatcher)
     }
 }

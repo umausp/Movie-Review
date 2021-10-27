@@ -7,27 +7,29 @@ import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.app.data.model.MovieReviewItemModel
+import com.app.data.storage.MovieReviewEntity
 import com.app.data.utils.log
 import com.app.moviereview.R
 import com.app.moviereview.databinding.FragmentMovieListLayoutBinding
 import com.app.moviereview.viewmodel.MovieReviewMainViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MovieReviewListFragment : Fragment() {
+class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClickListener {
 
     private var binding: FragmentMovieListLayoutBinding? = null
     private val viewModel: MovieReviewMainViewModel by activityViewModels()
 
     @Inject
-    lateinit var movieReviewAdapter: MovieReviewAdapter
+    lateinit var movieReviewAdapter: MovieReviePagedAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,45 +47,23 @@ class MovieReviewListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(viewModel) {
-            movieReviewResourceLiveData.observe(requireActivity()) {
-                it.onLoading {
-                    showLoadingToUI.value = it.isLoading()
-                }
-
-                it.onSuccess {
-                    showDataToRecyclerView(it)
-                }
-
-                it.onNetworkError { retry ->
-                    showSnackbar(getString(R.string.no_internet), retry)
-                }
-
-                it.onError { _, retry ->
-                    showSnackbar(getString(R.string.something_went_wrong), retry)
+            launchOnLifecycleScope {
+                movieReviewFlow.collectLatest {
+                    movieReviewAdapter.submitData(it)
                 }
             }
         }
         initView()
     }
 
-    private fun showDataToRecyclerView(list: List<MovieReviewItemModel>) {
-        movieReviewAdapter.setItems(list as ArrayList<MovieReviewItemModel>)
-    }
-
     private fun initView() {
-        movieReviewAdapter.movieReviewItemClick.observe(requireActivity()) {
-            viewModel.selectedReview.value = it
-            findNavController().navigate(R.id.action_MovieReviewListFragment_to_MovieReviewDetailsFragment)
-        }
-
         binding?.rvMovieReview?.adapter = movieReviewAdapter
         binding?.rvMovieReview?.layoutManager = LinearLayoutManager(
             context, LinearLayoutManager.VERTICAL,
             false
         )
+        movieReviewAdapter.onMovieItemClickListener = this
         binding?.rvMovieReview?.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-
-//            findNavController().navigate(R.id.action_ChatListFragment_to_ChatScreenFragment, createChatScreenBundle(it.userName))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -147,6 +127,17 @@ class MovieReviewListFragment : Fragment() {
             .setAction(getString(R.string.retry)) {
                 retry.invoke()
             }.show()
+    }
+
+    private fun launchOnLifecycleScope(execute: suspend () -> Unit) {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            execute()
+        }
+    }
+
+    override fun onMovieItemClicked(entity: MovieReviewEntity) {
+        viewModel.selectedReview.value = entity
+        findNavController().navigate(R.id.action_MovieReviewListFragment_to_MovieReviewDetailsFragment)
     }
 
     override fun onDestroyView() {
