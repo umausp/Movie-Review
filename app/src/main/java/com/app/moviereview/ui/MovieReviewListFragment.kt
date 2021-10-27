@@ -9,9 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.filter
-import androidx.paging.flatMap
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.data.storage.MovieReviewEntity
@@ -20,7 +20,6 @@ import com.app.moviereview.databinding.FragmentMovieListLayoutBinding
 import com.app.moviereview.viewmodel.MovieReviewMainViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import javax.inject.Inject
@@ -58,7 +57,6 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
         launchOnLifecycleScope {
             viewModel.movieReviewFlow.collectLatest {
                 movieReviewAdapter.submitData(it)
-
             }
         }
     }
@@ -70,6 +68,12 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
             false
         )
         movieReviewAdapter.onMovieItemClickListener = this
+        launchOnLifecycleScope {
+            movieReviewAdapter.loadStateFlow.collectLatest {
+                viewModel.showLoadingToUI.value = it.refresh is LoadState.Loading
+                showSnackbar(it.refresh is LoadState.Error)
+            }
+        }
         binding?.rvMovieReview?.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
     }
 
@@ -89,7 +93,7 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    if (newText?.length == 0){
+                    if (newText?.length == 0) {
                         observeListData()
                     } else {
                         onFilterText(newText?.takeIf {
@@ -103,7 +107,7 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
         }
     }
 
-    private fun resetOriginalData(name : String) {
+    private fun resetOriginalData(name: String) {
         launchOnLifecycleScope {
             viewModel.movieReviewFlow.collectLatest {
                 movieReviewAdapter.submitData(it.filter { it.headline.contains(name, ignoreCase = true) })
@@ -127,23 +131,24 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
 
     private fun sortByName() {
         launchOnLifecycleScope {
-            movieReviewAdapter.loadStateFlow.distinctUntilChangedBy {
-                it.refresh
-            }.collectLatest {
-                val adapterData = movieReviewAdapter.snapshot().items.sortedBy { it.title }
-                movieReviewAdapter.submitData(lifecycle, PagingData.from(adapterData))
-                activity?.runOnUiThread {
-                    binding?.rvMovieReview?.smoothScrollToPosition(0)
-                }
-            }
+            //Short with Adapter data
+            sortByNameWithData()
         }
     }
 
-    private fun showSnackbar(message: String, retry: () -> Unit) {
-        Snackbar.make(binding?.lytMainContainer ?: return, message, Snackbar.LENGTH_INDEFINITE)
-            .setAction(getString(R.string.retry)) {
-                retry.invoke()
-            }.show()
+    private fun sortByNameWithData() {
+        val adapterData = movieReviewAdapter.snapshot().items.sortedBy { it.title }
+        movieReviewAdapter.submitData(lifecycle, PagingData.from(adapterData))
+        activity?.runOnUiThread {
+            binding?.rvMovieReview?.smoothScrollToPosition(0)
+        }
+    }
+
+    private fun showSnackbar(isError: Boolean) {
+        if (isError) {
+            Snackbar.make(binding?.lytMainContainer ?: return, getString(R.string.something_went_wrong), Snackbar.LENGTH_INDEFINITE)
+                .show()
+        }
     }
 
     private fun launchOnLifecycleScope(execute: suspend () -> Unit) {
