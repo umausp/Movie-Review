@@ -20,7 +20,6 @@ private const val NETWORK_PAGE_SIZE = 20
 class MovieReviewRepository @Inject constructor(
     private val movieReviewApiService: MovieReviewApiService,
     private val movieReviewDb: MovieReviewDataBase,
-    private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     @WorkerThread
@@ -30,6 +29,6 @@ class MovieReviewRepository @Inject constructor(
     ) {
         movieReviewDb.getMovieReviewDao().moviesPagingSource()
 
-    }.flow.flowOn(ioDispatcher)
+    }.flow
 
 }

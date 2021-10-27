@@ -21,8 +21,7 @@ object MovieRepositoryModule {
     fun provideMovieRepository(
         movieReviewApiService: MovieReviewApiService,
         movieReviewDb: MovieReviewDataBase,
-        coroutineDispatcher: CoroutineDispatcher
     ): MovieReviewRepository {
-        return MovieReviewRepository(movieReviewApiService, movieReviewDb, coroutineDispatcher)
+        return MovieReviewRepository(movieReviewApiService, movieReviewDb)
     }
 }

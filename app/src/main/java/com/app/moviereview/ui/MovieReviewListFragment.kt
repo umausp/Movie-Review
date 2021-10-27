@@ -21,18 +21,17 @@ import com.app.moviereview.viewmodel.MovieReviewMainViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClickListener {
+class MovieReviewListFragment : Fragment(), MovieReviewPagedAdapter.MovieItemClickListener {
 
     private var binding: FragmentMovieListLayoutBinding? = null
     private val viewModel: MovieReviewMainViewModel by activityViewModels()
 
     @Inject
-    lateinit var movieReviewAdapter: MovieReviePagedAdapter
+    lateinit var movieReviewAdapter: MovieReviewPagedAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +74,11 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
             }
         }
         binding?.rvMovieReview?.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        viewModel.showErrorUI.observe(viewLifecycleOwner){
+            it.also {
+                showSnackbar(it)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -152,7 +156,7 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
     }
 
     private fun launchOnLifecycleScope(execute: suspend () -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             execute()
         }
     }

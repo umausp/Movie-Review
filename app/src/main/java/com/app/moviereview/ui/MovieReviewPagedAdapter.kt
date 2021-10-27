@@ -2,8 +2,6 @@ package com.app.moviereview.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.Lifecycle
-import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,21 +11,21 @@ import com.app.moviereview.databinding.ItemMovieReviewLayoutBinding
 import com.app.moviereview.utils.bindImageUrlWithImage
 import javax.inject.Inject
 
-class MovieReviePagedAdapter @Inject constructor() : PagingDataAdapter<MovieReviewEntity, MovieReviePagedAdapter.EpisodeViewHolder>(EpisodeComparator) {
+class MovieReviewPagedAdapter @Inject constructor() : PagingDataAdapter<MovieReviewEntity, MovieReviewPagedAdapter.MovieReviewItemViewHolder>(EpisodeComparator) {
 
     var onMovieItemClickListener: MovieItemClickListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        EpisodeViewHolder(
+        MovieReviewItemViewHolder(
             ItemMovieReviewLayoutBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
         )
 
-    override fun onBindViewHolder(holder: EpisodeViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MovieReviewItemViewHolder, position: Int) {
         getItem(holder.absoluteAdapterPosition)?.let { holder.bind(it) }
     }
 
-    inner class EpisodeViewHolder(private val binding: ItemMovieReviewLayoutBinding) :
+    inner class MovieReviewItemViewHolder(private val binding: ItemMovieReviewLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             itemView.setOnClickListener {
