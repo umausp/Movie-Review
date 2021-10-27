@@ -90,3 +90,51 @@ class MovieReviewPagingSource @Inject constructor(
         }
     }
 }
+
+
+@OptIn(ExperimentalPagingApi::class)
+class MovieReviewPagingSource1 @Inject constructor(
+    private val name : String,
+    private val movieReviewDb: MovieReviewDataBase,
+) : RemoteMediator<Int, MovieReviewEntity>() {
+
+    override suspend fun load(loadType: LoadType, state: PagingState<Int, MovieReviewEntity>): MediatorResult {
+        val page = when (loadType) {
+            LoadType.REFRESH -> {
+                MOVIE_REVIEW_STARTING_INDEX
+            }
+            LoadType.PREPEND -> {
+                return MediatorResult.Success(endOfPaginationReached = true)
+            }
+            LoadType.APPEND -> {
+                val lastItem = state.lastItemOrNull()
+                val remoteKey: RemoteKeys? = movieReviewDb.withTransaction {
+                    if (lastItem?.uId != null) {
+                        movieReviewDb.remoteKeysDao().remoteKeysRepoId(lastItem.uId)
+                    } else null
+                }
+
+                if (remoteKey?.hasMore == false) {
+                    return MediatorResult.Success(
+                        endOfPaginationReached = true
+                    )
+                }
+
+                remoteKey?.nextKey ?: MOVIE_REVIEW_STARTING_INDEX
+            }
+        }
+
+        try {
+
+            val response = movieReviewDb.getMovieReviewDao().getFilteredData1(name)
+            val endOfPaginationReached = !response.hasMore
+
+            return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
+        } catch (exception: IOException) {
+            return MediatorResult.Error(exception)
+        } catch (exception: HttpException) {
+            return MediatorResult.Error(exception)
+        }
+    }
+}
+

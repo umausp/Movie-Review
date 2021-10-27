@@ -9,16 +9,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagingData
+import androidx.paging.filter
+import androidx.paging.flatMap
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.data.storage.MovieReviewEntity
-import com.app.data.utils.log
 import com.app.moviereview.R
 import com.app.moviereview.databinding.FragmentMovieListLayoutBinding
 import com.app.moviereview.viewmodel.MovieReviewMainViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import javax.inject.Inject
 
 
@@ -46,14 +50,17 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        with(viewModel) {
-            launchOnLifecycleScope {
-                movieReviewFlow.collectLatest {
-                    movieReviewAdapter.submitData(it)
-                }
+        observeListData()
+        initView()
+    }
+
+    private fun observeListData() {
+        launchOnLifecycleScope {
+            viewModel.movieReviewFlow.collectLatest {
+                movieReviewAdapter.submitData(it)
+
             }
         }
-        initView()
     }
 
     private fun initView() {
@@ -75,16 +82,20 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
 
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    onFilterTextSubmit(query?.takeIf {
+                    onFilterText(query?.takeIf {
                         it.length > 2
                     })
                     return true
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    onFilterQueryChange(newText?.takeIf {
-                        it.length > 2
-                    })
+                    if (newText?.length == 0){
+                        observeListData()
+                    } else {
+                        onFilterText(newText?.takeIf {
+                            it.length > 2
+                        })
+                    }
                     return true
                 }
 
@@ -92,12 +103,16 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
         }
     }
 
-    private fun onFilterTextSubmit(query: String?) {
-        log(query)
+    private fun resetOriginalData(name : String) {
+        launchOnLifecycleScope {
+            viewModel.movieReviewFlow.collectLatest {
+                movieReviewAdapter.submitData(it.filter { it.headline.contains(name, ignoreCase = true) })
+            }
+        }
     }
 
-    private fun onFilterQueryChange(newText: String?) {
-        log(newText)
+    private fun onFilterText(query: String?) {
+        query?.let { resetOriginalData(it) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -106,20 +121,22 @@ class MovieReviewListFragment : Fragment(), MovieReviePagedAdapter.MovieItemClic
                 sortByName()
                 true
             }
-            R.id.search -> {
-                filterData()
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun filterData() {
-
-    }
-
     private fun sortByName() {
-
+        launchOnLifecycleScope {
+            movieReviewAdapter.loadStateFlow.distinctUntilChangedBy {
+                it.refresh
+            }.collectLatest {
+                val adapterData = movieReviewAdapter.snapshot().items.sortedBy { it.title }
+                movieReviewAdapter.submitData(lifecycle, PagingData.from(adapterData))
+                activity?.runOnUiThread {
+                    binding?.rvMovieReview?.smoothScrollToPosition(0)
+                }
+            }
+        }
     }
 
     private fun showSnackbar(message: String, retry: () -> Unit) {

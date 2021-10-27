@@ -2,7 +2,8 @@ package com.app.moviereview.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Lifecycle
+import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,9 +14,8 @@ import com.app.moviereview.utils.bindImageUrlWithImage
 import javax.inject.Inject
 
 class MovieReviePagedAdapter @Inject constructor() : PagingDataAdapter<MovieReviewEntity, MovieReviePagedAdapter.EpisodeViewHolder>(EpisodeComparator) {
-    val movieReviewItemClick = MutableLiveData<MovieReviewEntity>()
 
-    var onMovieItemClickListener : MovieItemClickListener?=null
+    var onMovieItemClickListener: MovieItemClickListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         EpisodeViewHolder(
             ItemMovieReviewLayoutBinding.inflate(

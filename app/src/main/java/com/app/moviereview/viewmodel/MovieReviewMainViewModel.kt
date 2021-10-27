@@ -4,19 +4,14 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.app.data.model.MovieReviewItemModel
 import com.app.data.repository.MovieReviewRepository
 import com.app.data.storage.MovieReviewEntity
 import com.app.data.utils.Resource
 import com.app.data.utils.toResource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,6 +23,7 @@ class MovieReviewMainViewModel @ExperimentalPagingApi
 ) : ViewModel() {
 
     private lateinit var _movieReviewFlow: Flow<PagingData<MovieReviewEntity>>
+    private lateinit var _movieReviewFlow1: MutableList<PagingData<MovieReviewEntity>>
     val movieReviewResourceLiveData = MediatorLiveData<Resource<List<MovieReviewItemModel>>>()
     val showLoadingToUI = MutableLiveData<Boolean>()
     val selectedReview = MutableLiveData<MovieReviewEntity>()
@@ -35,8 +31,16 @@ class MovieReviewMainViewModel @ExperimentalPagingApi
     val movieReviewFlow: Flow<PagingData<MovieReviewEntity>>
         get() = _movieReviewFlow
 
+    val movieOriginalList = ArrayList<MovieReviewEntity>()
+
     fun getAllMovieReview() = launchPagingAsync( {
         movieReviewRepository.getAllMovies().cachedIn(viewModelScope)
+    }){
+        _movieReviewFlow = it
+    }
+
+    fun filterPagedDataWithName(name : String) = launchPagingAsync( {
+        movieReviewRepository.getAllMovies(sort = true).cachedIn(viewModelScope)
     }){
         _movieReviewFlow = it
     }

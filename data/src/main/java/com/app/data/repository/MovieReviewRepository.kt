@@ -7,6 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.app.data.network.MovieReviewApiService
 import com.app.data.paging.MovieReviewPagingSource
+import com.app.data.paging.MovieReviewPagingSource1
 import com.app.data.storage.MovieReviewDataBase
 import com.app.data.storage.MovieReviewEntity
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,11 +25,23 @@ class MovieReviewRepository @Inject constructor(
 ) {
 
     @WorkerThread
-    fun getAllMovies(): Flow<PagingData<MovieReviewEntity>> = Pager(
+    fun getAllMovies(name: String = "", sort : Boolean = false): Flow<PagingData<MovieReviewEntity>> = Pager(
         config = PagingConfig(pageSize = NETWORK_PAGE_SIZE),
         remoteMediator = MovieReviewPagingSource(movieReviewApiService, movieReviewDb)
     ) {
-        movieReviewDb.getMovieReviewDao().moviesPagingSource()
+        if(sort){
+            movieReviewDb.getMovieReviewDao().moviesPagingSource1()
+        } else {
+            movieReviewDb.getMovieReviewDao().moviesPagingSource(name)
+        }
+
+    }.flow.flowOn(ioDispatcher)
+
+    fun getFilteredMovies(name: String): Flow<PagingData<MovieReviewEntity>> = Pager(
+        config = PagingConfig(pageSize = NETWORK_PAGE_SIZE),
+        remoteMediator = MovieReviewPagingSource1(name, movieReviewDb)
+    ) {
+        movieReviewDb.getMovieReviewDao().getFilteredData(name)
     }.flow.flowOn(ioDispatcher)
 
 }

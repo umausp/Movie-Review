@@ -39,11 +39,17 @@ interface MovieReviewDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllMovieReviews(movieReviewEntity: List<MovieReviewEntity>)
 
-    @Query("select * from movieReviewEntity")
-    suspend fun getAllSavedList(): List<MovieReviewEntity>
+    @Query("select * from movieReviewEntity where title LIKE '%' || :name || '%'")
+    fun getFilteredData(name : String): PagingSource<Int, MovieReviewEntity>
 
-    @Query("SELECT * FROM movieReviewEntity")
-    fun moviesPagingSource(): PagingSource<Int, MovieReviewEntity>
+    @Query("select * from movieReviewEntity where title LIKE '%' || :name || '%'")
+    suspend fun getFilteredData1(name : String): MovieReviewEntity
+
+    @Query("SELECT * from movieReviewEntity where title LIKE '%' || :name || '%'")
+    fun moviesPagingSource(name : String): PagingSource<Int, MovieReviewEntity>
+
+    @Query("SELECT * from movieReviewEntity order by title ASC")
+    fun moviesPagingSource1(): PagingSource<Int, MovieReviewEntity>
 
     @Query("SELECT * FROM movieReviewEntity WHERE uId = :entityId")
     suspend fun movieEntityId(entityId: Int): MovieReviewEntity?
