@@ -14,7 +14,4 @@ fun SimpleDraweeView.bindImageUrlWithImage(imgUrl: String?) {
         .build()
 
     setImageRequest(imageRequest)
-
 }
-//        val imagePipeline = Fresco.getImagePipeline()
-//        imagePipeline.evictFromCache(Uri.parse(img))
